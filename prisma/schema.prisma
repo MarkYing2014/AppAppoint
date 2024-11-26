@@ -1,0 +1,95 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  engineType = "binary"
+  previewFeatures = []
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model SalesRep {
+  id                    String        @id @default(cuid())
+  name                  String
+  email                 String        @unique
+  phone                 String
+  territory            Territory?     @relation(fields: [territoryId], references: [id])
+  territoryId          String?
+  availability         String        @default("available")
+  workingHoursStart    String?       @default("09:00")
+  workingHoursEnd      String?       @default("17:00")
+  notifyEmail          Boolean       @default(true)
+  notifySms            Boolean       @default(false)
+  notifyApp            Boolean       @default(true)
+  createdAt            DateTime      @default(now())
+  updatedAt            DateTime      @updatedAt
+  appointments         Appointment[]
+  events              Event[]
+}
+
+model Territory {
+  id          String     @id @default(cuid())
+  name        String     @unique
+  description String?
+  salesReps   SalesRep[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+model Client {
+  id           String        @id @default(cuid())
+  name         String
+  email        String        @unique
+  phone        String
+  notes        String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  appointments Appointment[]
+  events       Event[]
+}
+
+model Appointment {
+  id          String    @id @default(cuid())
+  title       String
+  startTime   DateTime
+  endTime     DateTime
+  location    String?
+  description String?
+  client      Client    @relation(fields: [clientId], references: [id])
+  clientId    String
+  salesRep    SalesRep  @relation(fields: [salesRepId], references: [id])
+  salesRepId  String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Event {
+  id          String    @id @default(cuid())
+  title       String
+  date        DateTime
+  startTime   String
+  endTime     String
+  notes       String?
+  status      String    @default("scheduled")
+  client      Client    @relation(fields: [clientId], references: [id])
+  clientId    String
+  salesRep    SalesRep  @relation(fields: [salesRepId], references: [id])
+  salesRepId  String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model SystemSettings {
+  id                String   @id @default(cuid())
+  workingHoursStart String   @default("09:00")
+  workingHoursEnd   String   @default("17:00")
+  defaultTerritory  String?
+  notifyEmail       Boolean  @default(true)
+  notifySms         Boolean  @default(false)
+  notifyApp         Boolean  @default(true)
+  updatedAt         DateTime @updatedAt
+}
