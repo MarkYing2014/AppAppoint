@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { toUTCDate } from '@/lib/date-utils';
 
 const TIMEOUT_MS = 10000;
 
@@ -32,16 +33,11 @@ export async function PUT(
       return NextResponse.json({ error: 'Event not found' }, { status: 404 });
     }
 
-    // Create a date object at noon UTC to avoid timezone issues
-    const dateStr = data.date;
-    const [year, month, day] = dateStr.split('-').map(Number);
-    const utcDate = new Date(Date.UTC(year, month - 1, day, 12, 0, 0));
-
     const updatedEvent = await prisma.event.update({
       where: { id: params.id },
       data: {
         title: data.title,
-        date: utcDate,
+        date: toUTCDate(data.date),
         startTime: data.startTime,
         endTime: data.endTime,
         clientId: data.clientId,

@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { format } from 'date-fns';
+import { format, toISODateString } from 'date-fns';
 
 interface Client {
   id: string;
@@ -91,7 +91,7 @@ export function EventDialog({ initialDate, event, trigger, onEventSaved, open: c
     } else if (initialDate) {
       setFormData(prev => ({
         ...prev,
-        date: initialDate.toISOString().split('T')[0]
+        date: toISODateString(initialDate)
       }));
     }
   }, [event, initialDate]);
@@ -130,11 +130,10 @@ export function EventDialog({ initialDate, event, trigger, onEventSaved, open: c
     try {
       setLoading(true);
       
-      // Format the date string directly without timezone conversion
+      // Keep the date as YYYY-MM-DD string, it will be converted to UTC in the API
       const formattedData = {
         ...(event?.id ? { id: event.id } : {}),
         ...formData,
-        date: formData.date, // Keep the date as YYYY-MM-DD string
       };
       
       console.log('Submitting form data:', formattedData);
@@ -180,7 +179,7 @@ export function EventDialog({ initialDate, event, trigger, onEventSaved, open: c
     } else {
       setFormData({
         title: '',
-        date: initialDate ? initialDate.toISOString().split('T')[0] : '',
+        date: initialDate ? toISODateString(initialDate) : '',
         startTime: '09:00',
         endTime: '10:00',
         clientId: '',

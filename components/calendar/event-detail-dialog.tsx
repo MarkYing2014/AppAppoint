@@ -55,6 +55,22 @@ export function EventDetailDialog({ event, isOpen, onClose, onEdit }: EventDetai
     return status.charAt(0).toUpperCase() + status.slice(1);
   };
 
+  const formatDisplayDate = (date: string) => {
+    return new Date(date).toLocaleDateString(undefined, {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
+
+  const formatDisplayTime = (time: string) => {
+    return new Date(`1970-01-01T${time}Z`).toLocaleTimeString(undefined, {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[500px]">
@@ -71,12 +87,7 @@ export function EventDetailDialog({ event, isOpen, onClose, onEdit }: EventDetai
             <Calendar className="h-5 w-5 text-muted-foreground mt-0.5" />
             <div>
               <p className="font-medium">
-                {new Date(event.date).toLocaleDateString(undefined, {
-                  weekday: 'long',
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric'
-                })}
+                {formatDisplayDate(event.date)}
               </p>
               <p className="text-sm text-muted-foreground">Date</p>
             </div>
@@ -86,7 +97,7 @@ export function EventDetailDialog({ event, isOpen, onClose, onEdit }: EventDetai
             <Clock className="h-5 w-5 text-muted-foreground mt-0.5" />
             <div>
               <p className="font-medium">
-                {event.startTime} - {event.endTime}
+                {formatDisplayTime(event.startTime)} - {formatDisplayTime(event.endTime)}
               </p>
               <p className="text-sm text-muted-foreground">Time</p>
             </div>
