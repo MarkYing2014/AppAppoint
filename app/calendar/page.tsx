@@ -174,22 +174,14 @@ export default function CalendarPage() {
 
   const handleTimeSlotClick = (date: Date, time: string) => {
     console.log('Time slot clicked:', { date, time });
-    setSelectedEvent(null);
-    setEventDialogOpen(true);
-    // Pre-fill the event with the selected date and time
-    setSelectedEvent({
-      id: '',
-      title: '',
+    const newEvent = {
       date: format(date, 'yyyy-MM-dd'),
       startTime: time,
       endTime: format(addHours(new Date(`${format(date, 'yyyy-MM-dd')}T${time}`), 1), 'HH:mm'),
-      clientId: '',
-      salesRepId: selectedReps[0] || '',
-      client: { name: '' },
-      salesRep: { name: '' },
-      notes: '',
-      status: 'scheduled'
-    });
+    };
+    setSelectedEvent(newEvent);
+    setEventDetailOpen(false);
+    setEventDialogOpen(true);
   };
 
   return (
@@ -352,7 +344,8 @@ export default function CalendarPage() {
 
         {eventDialogOpen && (
           <EventDialog
-            event={selectedEvent}
+            initialDate={new Date(`${selectedEvent?.date || format(date, 'yyyy-MM-dd')}T${selectedEvent?.startTime || '09:00'}`)}
+            event={selectedEvent?.id ? selectedEvent : undefined}
             open={eventDialogOpen}
             onOpenChange={(open) => {
               console.log("Dialog open state changing to:", open);

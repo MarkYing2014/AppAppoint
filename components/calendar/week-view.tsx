@@ -70,7 +70,7 @@ export function WeekView({ date, selectedReps, salesReps, events, onEventClick, 
       {/* Time labels */}
       <div className="w-16 flex-none border-r bg-background">
         <div className="sticky top-0 z-30 h-10 border-b bg-background" />
-        <div className="space-y-[47px]">
+        <div>
           {HOURS.map((hour) => (
             <div
               key={hour}
@@ -102,7 +102,7 @@ export function WeekView({ date, selectedReps, salesReps, events, onEventClick, 
             </div>
 
             {/* Hours */}
-            <div className="relative">
+            <div className="relative min-h-[1152px]">
               {HOURS.map((hour) => (
                 <div
                   key={hour}
@@ -130,18 +130,15 @@ export function WeekView({ date, selectedReps, salesReps, events, onEventClick, 
                   return matches;
                 })
                 .sort((a, b) => {
-                  // First sort by start time
                   if (a.startTime !== b.startTime) {
                     return a.startTime.localeCompare(b.startTime);
                   }
-                  // If start times are equal, sort by client name
                   return (a.client?.name || '').localeCompare(b.client?.name || '');
                 })
                 .map((event, index, sameTimeEvents) => {
                   const [startHour, startMinute] = event.startTime.split(':').map(Number);
                   const [endHour, endMinute] = event.endTime.split(':').map(Number);
                   
-                  // Calculate how many events overlap at this time
                   const overlappingEvents = sameTimeEvents.filter(e => {
                     const [eStartHour, eStartMinute] = e.startTime.split(':').map(Number);
                     const [eEndHour, eEndMinute] = e.endTime.split(':').map(Number);
@@ -156,11 +153,9 @@ export function WeekView({ date, selectedReps, salesReps, events, onEventClick, 
                   const width = `${90 / overlappingEvents.length}%`;
                   const left = `${(90 / overlappingEvents.length) * position}%`;
                   
-                  // Calculate top position (1 hour = 48px)
-                  const top = startHour * 48 + Math.floor(startMinute * 0.8);
-                  // Calculate height (1 minute = 0.8px)
-                  const duration = (endHour * 60 + endMinute) - (startHour * 60 + startMinute);
-                  const height = Math.max(duration * 0.8, 20); // Minimum height of 20px
+                  const top = (startHour * 48) + (startMinute / 60 * 48);
+                  const duration = ((endHour * 60 + endMinute) - (startHour * 60 + startMinute)) / 60;
+                  const height = Math.max(duration * 48, 20); // Minimum height of 20px
                   
                   console.log('Event positioning:', {
                     event: event.title,

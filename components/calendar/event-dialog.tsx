@@ -7,7 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { format, toISODateString } from 'date-fns';
+import { format } from 'date-fns';
+import { toISODateString } from '@/lib/date-utils';
 
 interface Client {
   id: string;
@@ -152,10 +153,14 @@ export function EventDialog({ initialDate, event, trigger, onEventSaved, open: c
         throw new Error(responseData.error || 'Failed to save event');
       }
 
-      console.log('Event saved successfully:', responseData);
+      // First update UI and show success message
       toast.success(event ? 'Event updated successfully' : 'Event created successfully');
+      
+      // Then close dialog and notify parent
       onEventSaved?.(responseData);
       setOpen(false);
+      
+      console.log('Event saved successfully:', responseData);
     } catch (error) {
       console.error('Error saving event:', error);
       toast.error(error instanceof Error ? error.message : 'Failed to save event');
