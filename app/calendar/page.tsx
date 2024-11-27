@@ -94,10 +94,19 @@ export default function CalendarPage() {
       if (data.error) {
         throw new Error(data.error);
       }
-      console.log('Fetched sales reps from database:', data);
+      console.log('Calendar - Fetched sales reps:', JSON.stringify(data, null, 2));
+      
+      if (data.length === 0) {
+        console.log('Calendar - No sales reps found');
+      } else {
+        console.log(`Calendar - Found ${data.length} sales reps`);
+        console.log('Calendar - Sales rep IDs:', data.map(rep => rep.id));
+      }
+      
       setSalesReps(data);
+      setSelectedReps(data.map(rep => rep.id));
     } catch (error) {
-      console.error('Error fetching sales reps:', error);
+      console.error('Calendar - Error fetching sales reps:', error);
       toast.error('Failed to load sales representatives. Please try again.');
     }
   };
@@ -110,6 +119,20 @@ export default function CalendarPage() {
   useEffect(() => {
     fetchEvents();
   }, [date]);
+
+  useEffect(() => {
+    console.log('Calendar state:', {
+      salesReps: salesReps.map(rep => ({ id: rep.id, name: rep.name })),
+      selectedReps: selectedReps,
+      events: events.map(event => ({
+        id: event.id,
+        title: event.title,
+        date: event.date,
+        salesRepId: event.salesRepId,
+        salesRepName: event.salesRep?.name,
+      })),
+    });
+  }, [salesReps, selectedReps, events]);
 
   const navigateToToday = () => {
     const today = new Date();

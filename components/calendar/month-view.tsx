@@ -52,7 +52,10 @@ export function MonthView({ date, selectedReps, salesReps, events, onEventClick,
       eventDate: format(eventDate, 'yyyy-MM-dd'),
       currentMonth: format(date, 'yyyy-MM'),
       isInMonth,
-      isSelectedRep
+      isSelectedRep,
+      eventSalesRepId: event.salesRepId,
+      selectedReps,
+      salesReps: salesReps.map(rep => ({ id: rep.id, name: rep.name }))
     });
     
     return isInMonth && isSelectedRep;
@@ -131,7 +134,14 @@ export function MonthView({ date, selectedReps, salesReps, events, onEventClick,
                     <div className="font-medium truncate">{event.title}</div>
                     <div className="text-xs truncate">
                       {event.startTime} - {event.endTime}
-                      {event.client?.name && <span className="ml-1">({event.client.name})</span>}
+                    </div>
+                    {event.client?.name && (
+                      <div className="text-xs truncate mt-0.5 opacity-75">
+                        {event.client.name}
+                      </div>
+                    )}
+                    <div className="text-xs truncate mt-0.5 opacity-75">
+                      {salesReps.find(rep => rep.id === event.salesRepId)?.name || 'Unknown Rep'}
                     </div>
                   </div>
                 ))}

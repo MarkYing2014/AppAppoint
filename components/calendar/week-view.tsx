@@ -53,7 +53,10 @@ export function WeekView({ date, selectedReps, salesReps, events, onEventClick, 
       eventDate: format(eventDate, 'yyyy-MM-dd'),
       currentDate: format(currentDate, 'yyyy-MM-dd'),
       isInWeek,
-      isSelectedRep
+      isSelectedRep,
+      eventSalesRepId: event.salesRepId,
+      selectedReps,
+      salesReps: salesReps.map(rep => ({ id: rep.id, name: rep.name }))
     });
     
     return isInWeek && isSelectedRep;
@@ -200,6 +203,9 @@ export function WeekView({ date, selectedReps, salesReps, events, onEventClick, 
                           {event.client.name}
                         </div>
                       )}
+                      <div className="text-xs truncate mt-0.5 opacity-75">
+                        {salesReps.find(rep => rep.id === event.salesRepId)?.name || 'Unknown Rep'}
+                      </div>
                     </div>
                   );
                 })}

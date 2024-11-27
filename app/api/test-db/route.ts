@@ -1,43 +1,46 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import db from "@/lib/prisma";
 
 export async function GET() {
+  console.log('Testing database connection...'); // Debug log
+
   try {
-    console.log("Testing database connection...");
-    
     // Test basic connection
-    await prisma.$connect();
-    console.log("Database connection successful");
+    await db.$connect();
+    console.log('Basic connection successful'); // Debug log
 
     // Try to query the database
-    const result = await prisma.$queryRaw`SELECT current_timestamp`;
-    console.log("Database query successful:", result);
+    const result = await db.$queryRaw`SELECT NOW() as server_time`;
+    console.log('Query successful:', result); // Debug log
 
-    // Try to count sales reps
-    const salesRepsCount = await prisma.salesRep.count();
-    console.log("Current number of sales reps:", salesRepsCount);
+    // Test user table access
+    const userCount = await db.user.count();
+    console.log('User count:', userCount); // Debug log
 
-    return NextResponse.json({ 
-      status: "success",
-      message: "Database connection successful",
-      timestamp: new Date().toISOString(),
-      salesRepsCount
+    return NextResponse.json({
+      status: 'success',
+      message: 'Database connection and queries successful',
+      details: {
+        serverTime: result,
+        userCount,
+        databaseUrl: process.env.DATABASE_URL?.replace(/:[^:]+@/, ':****@') // Hide password
+      }
     });
   } catch (error: any) {
-    console.error("Database connection error:", {
+    console.error('Database test failed:', {
       message: error.message,
       code: error.code,
-      meta: error?.meta,
-      stack: error.stack
+      meta: error?.meta
     });
 
     return NextResponse.json({
-      status: "error",
+      status: 'error',
+      message: 'Database connection or query failed',
       error: error.message,
       code: error.code,
-      timestamp: new Date().toISOString()
+      meta: error?.meta
     }, { status: 500 });
   } finally {
-    await prisma.$disconnect();
+    await db.$disconnect();
   }
 }

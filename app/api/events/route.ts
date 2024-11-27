@@ -57,15 +57,29 @@ export async function POST(request: Request) {
 
 export async function GET() {
   try {
+    console.log('Fetching events from database...');
     const events = await Promise.race([
       prisma.event.findMany({
         include: {
-          client: true,
-          salesRep: {
-            include: {
-              territory: true,
+          client: {
+            select: {
+              name: true,
             },
           },
+          salesRep: {
+            select: {
+              id: true,
+              name: true,
+              territory: {
+                select: {
+                  name: true,
+                },
+              },
+            },
+          },
+        },
+        orderBy: {
+          date: 'asc',
         },
       }),
       new Promise((_, reject) =>
@@ -73,13 +87,25 @@ export async function GET() {
       ),
     ]);
 
-    console.log('Fetched events:', events);
+    console.log('Events fetched successfully:', JSON.stringify({
+      count: events.length,
+      events: events.map(event => ({
+        id: event.id,
+        title: event.title,
+        date: event.date,
+        salesRepId: event.salesRepId,
+        salesRepName: event.salesRep?.name,
+        clientName: event.client?.name,
+      })),
+    }, null, 2));
+
     return NextResponse.json(events);
   } catch (error: any) {
     console.error('Error fetching events:', {
       message: error.message,
       code: error.code,
       name: error.name,
+      stack: error.stack,
     });
     return NextResponse.json(
       { error: 'Failed to fetch events', details: error.message },

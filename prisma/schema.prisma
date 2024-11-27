@@ -12,8 +12,28 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Role {
+  ADMIN
+  SALES_REP
+}
+
+model User {
+  id                 String    @id @default(cuid())
+  email              String    @unique
+  emailVerified      Boolean   @default(false)
+  verificationToken  String?
+  verificationExpires DateTime?
+  password           String
+  role               Role      @default(SALES_REP)
+  salesRep           SalesRep? @relation(fields: [salesRepId], references: [id])
+  salesRepId         String?   @unique
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+}
+
 model SalesRep {
   id                    String        @id @default(cuid())
+  user                  User?
   name                  String
   email                 String        @unique
   phone                 String

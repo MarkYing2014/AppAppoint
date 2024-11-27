@@ -12,13 +12,22 @@ export async function GET() {
       },
     });
     
-    console.log('Fetched sales reps:', salesReps);
+    // Log the sales reps for debugging
+    console.log('API - Fetched sales reps:', JSON.stringify(salesReps, null, 2));
+    
+    if (salesReps.length === 0) {
+      console.log('API - No sales reps found in the database');
+    } else {
+      console.log(`API - Found ${salesReps.length} sales reps`);
+    }
+    
     return NextResponse.json(salesReps);
   } catch (error: any) {
     console.error('Error fetching sales reps:', {
       message: error.message,
       code: error.code,
       name: error.name,
+      stack: error.stack,
     });
     return NextResponse.json(
       { error: 'Failed to fetch sales representatives', details: error.message },
@@ -61,12 +70,15 @@ export async function POST(request: Request) {
       },
     });
     
+    console.log('API - Created sales rep:', JSON.stringify(salesRep, null, 2));
+    
     return NextResponse.json(salesRep);
   } catch (error: any) {
     console.error('Error creating sales rep:', {
       message: error.message,
       code: error.code,
       name: error.name,
+      stack: error.stack,
     });
     return NextResponse.json(
       { error: 'Failed to create sales representative', details: error.message },
@@ -111,12 +123,15 @@ export async function PUT(request: Request) {
       },
     });
     
+    console.log('API - Updated sales rep:', JSON.stringify(salesRep, null, 2));
+    
     return NextResponse.json(salesRep);
   } catch (error: any) {
     console.error('Error updating sales rep:', {
       message: error.message,
       code: error.code,
       name: error.name,
+      stack: error.stack,
     });
     return NextResponse.json(
       { error: 'Failed to update sales representative', details: error.message },
@@ -141,12 +156,15 @@ export async function DELETE(request: Request) {
       where: { id },
     });
 
+    console.log(`API - Deleted sales rep with ID ${id}`);
+    
     return NextResponse.json({ success: true });
   } catch (error: any) {
     console.error('Error deleting sales rep:', {
       message: error.message,
       code: error.code,
       name: error.name,
+      stack: error.stack,
     });
     return NextResponse.json(
       { error: 'Failed to delete sales representative', details: error.message },
